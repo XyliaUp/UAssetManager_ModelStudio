@@ -4,7 +4,7 @@ A UAssetManager plugin for previewing FBX and PMX models, validating bone mappin
 
 ## Install
 
-1. In UAssetManager 1.0.2 or later on Windows x64, choose **Plugins → Install from Repository…**.
+1. Open [UAssetManager 1.0.2 Preview](https://github.com/XyliaUp/UAssetManager/releases/tag/v1.0.2-modelstudio-preview.1) or later on Windows x64 and choose **Plugins → Install from Repository…**.
 2. Paste `https://github.com/XyliaUp/UAssetManager_ModelStudio`, select **Find Release**, and install the listed package.
 3. Restart UAssetManager and open **Plugins → Model Studio**.
 
