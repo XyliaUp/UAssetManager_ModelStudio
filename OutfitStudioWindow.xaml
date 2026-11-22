@@ -1,0 +1,364 @@
+<Window x:Class="UAssetManager.ModelStudio.OutfitStudioWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:UAssetManager.ModelStudio"
+        Width="980" Height="610" MinWidth="780" MinHeight="450"
+        WindowStartupLocation="CenterScreen" ShowInTaskbar="True" Background="#E9EDEB" Loaded="Window_Loaded"
+        FontFamily="Segoe UI, Microsoft YaHei UI" FontSize="13"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+    <Window.Resources>
+        <SolidColorBrush x:Key="Ink" Color="#192E30" />
+        <SolidColorBrush x:Key="Muted" Color="#51686A" />
+        <SolidColorBrush x:Key="Accent" Color="#185C50" />
+        <SolidColorBrush x:Key="Rule" Color="#CCD5D0" />
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource Ink}" />
+        </Style>
+        <Style x:Key="SectionHeading" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,12" />
+        </Style>
+        <Style x:Key="PathLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="Margin" Value="0,9,0,4" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style x:Key="FieldLabel" TargetType="Label">
+            <Setter Property="Margin" Value="0,9,0,4" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Foreground" Value="{StaticResource Ink}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+        <Style x:Key="FieldHint" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="Foreground" Value="{StaticResource Muted}" />
+            <Setter Property="Margin" Value="0,5,0,0" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style x:Key="SettingsExpander" TargetType="Expander">
+            <Setter Property="Foreground" Value="{StaticResource Ink}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0,4,0,0" />
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Padding" Value="6,3" />
+            <Setter Property="BorderBrush" Value="{StaticResource Rule}" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="10,3" />
+            <Setter Property="MinHeight" Value="27" />
+            <Setter Property="Background" Value="#F8FAF9" />
+            <Setter Property="Foreground" Value="{StaticResource Ink}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Rule}" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style x:Key="PrimaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="{StaticResource Accent}" />
+            <Setter Property="BorderBrush" Value="{StaticResource Accent}" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </Window.Resources>
+    <Grid Background="#E9EDEB">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid Margin="12,12,12,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="290" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border Background="#FAFCFB" BorderBrush="{StaticResource Rule}" BorderThickness="1" Padding="12,10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ScrollViewer x:Name="InputPanel" VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <TextBlock Text="{local:StudioText Key=Window.Inputs}" Style="{StaticResource SectionHeading}" Margin="0,0,0,2" />
+                            <Label Target="{Binding ElementName=SourcePath}" Content="{local:StudioText Key=Window.SourceModel}" Style="{StaticResource FieldLabel}" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="SourcePath" IsReadOnly="True" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" AutomationProperties.Name="{local:StudioText Key=Window.SourcePath}" />
+                                <Button Grid.Column="1" Content="{local:StudioText Key=Window.Select}" Margin="7,0,0,0" Tag="Source" Click="Browse_Click" AutomationProperties.Name="{local:StudioText Key=Window.SelectModel}" />
+                            </Grid>
+
+                            <Label Target="{Binding ElementName=TargetPicker}" Content="{local:StudioText Key=Window.TargetOutfit}" Style="{StaticResource FieldLabel}" />
+                            <ComboBox x:Name="TargetPicker" MinHeight="27" Padding="6,2" DisplayMemberPath="Name"
+                                      SelectionChanged="TargetPicker_Changed" AutomationProperties.Name="{local:StudioText Key=Window.TargetOutfit}" />
+                            <Grid x:Name="FbxTargetInput" Visibility="Collapsed" Margin="0,7,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="ReferenceFbxPath" TextChanged="InspectionInput_Changed" AutomationProperties.Name="{local:StudioText Key=Window.ReferenceFbx}" />
+                                <Button Grid.Column="1" Content="{local:StudioText Key=Window.Select}" Margin="7,0,0,0" Tag="ReferenceFbx" Click="Browse_Click" AutomationProperties.Name="{local:StudioText Key=Window.SelectReferenceFbx}" />
+                            </Grid>
+                            <StackPanel x:Name="PackageInput" Visibility="Collapsed" Margin="0,7,0,0">
+                                <TextBox x:Name="TargetPath" TextChanged="InspectionInput_Changed" AutomationProperties.Name="{local:StudioText Key=Window.CustomTargetPath}" />
+                                <TextBlock Text="{local:StudioText Key=Window.TargetPathHint}" Style="{StaticResource FieldHint}" />
+                            </StackPanel>
+                            <StackPanel x:Name="TemplateInput" Visibility="Collapsed" Margin="0,7,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="TemplatePath" TextChanged="InspectionInput_Changed" AutomationProperties.Name="{local:StudioText Key=Window.TemplatePath}" />
+                                    <Button Grid.Column="1" Content="{local:StudioText Key=Window.Select}" Margin="7,0,0,0" Tag="Template" Click="Browse_Click" AutomationProperties.Name="{local:StudioText Key=Window.SelectTemplate}" />
+                                </Grid>
+                                <TextBlock Text="{local:StudioText Key=Window.TemplateHint}" Style="{StaticResource FieldHint}" />
+                            </StackPanel>
+
+                            <Button x:Name="InspectButton" Content="{local:StudioText Key=Window.LoadTargetRig}" Margin="0,10,0,0" HorizontalAlignment="Stretch"
+                                    IsEnabled="False" Click="Inspect_Click" />
+                            <Separator Margin="0,12,0,3" Background="{StaticResource Rule}" />
+                            <Expander x:Name="AdvancedSettings" Header="{local:StudioText Key=Window.AdvancedSettings}" Margin="0,4,0,0" Style="{StaticResource SettingsExpander}">
+                                <StackPanel Margin="0,4,0,12">
+                                    <TextBlock Text="{local:StudioText Key=Window.ModelTransform}" Style="{StaticResource PathLabel}" />
+                                    <UniformGrid Columns="4">
+                                        <StackPanel Margin="0,0,6,0">
+                                            <TextBlock Text="{local:StudioText Key=Window.Scale}" Foreground="{StaticResource Muted}" />
+                                            <TextBox x:Name="ScaleInput" Text="1" TextChanged="TransformInput_Changed" AutomationProperties.Name="{local:StudioText Key=Window.UniformScale}" />
+                                        </StackPanel>
+                                        <StackPanel Margin="0,0,6,0">
+                                            <TextBlock Text="X (cm)" Foreground="{StaticResource Muted}" />
+                                            <TextBox x:Name="OffsetXInput" Text="0" TextChanged="TransformInput_Changed" AutomationProperties.Name="{local:StudioText Key=Window.OffsetForward}" />
+                                        </StackPanel>
+                                        <StackPanel Margin="0,0,6,0">
+                                            <TextBlock Text="Y (cm)" Foreground="{StaticResource Muted}" />
+                                            <TextBox x:Name="OffsetYInput" Text="0" TextChanged="TransformInput_Changed" AutomationProperties.Name="{local:StudioText Key=Window.OffsetRight}" />
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <TextBlock Text="Z (cm)" Foreground="{StaticResource Muted}" />
+                                            <TextBox x:Name="OffsetZInput" Text="0" TextChanged="TransformInput_Changed" AutomationProperties.Name="{local:StudioText Key=Window.OffsetUp}" />
+                                        </StackPanel>
+                                    </UniformGrid>
+                                    <StackPanel x:Name="BnsProductionSettings" Visibility="Collapsed">
+                                        <Label Target="{Binding ElementName=OutfitId}" Content="{local:StudioText Key=Window.OptionalBuildName}" Style="{StaticResource FieldLabel}" />
+                                        <TextBox x:Name="OutfitId" MaxLength="48" AutomationProperties.Name="{local:StudioText Key=Window.BuildName}" />
+                                        <TextBlock Text="{local:StudioText Key=Window.BuildNameHint}" Style="{StaticResource FieldHint}" />
+                                        <local:OutfitProductionOptions x:Name="ProductionOptions" Margin="0,12,0,0" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
+
+                            <Expander x:Name="EnvironmentSettings" Margin="0,3,0,0" Style="{StaticResource SettingsExpander}">
+                                <Expander.Header>
+                                    <StackPanel>
+                                        <TextBlock Text="{local:StudioText Key=Window.BuildEnvironment}" FontWeight="SemiBold" />
+                                        <TextBlock x:Name="EnvironmentStatus" Text="{local:StudioText Key=Window.DetectEnvironment}" Style="{StaticResource FieldHint}" Margin="0,3,0,0" />
+                                    </StackPanel>
+                                </Expander.Header>
+                                <StackPanel Margin="0,4,0,9">
+                                    <StackPanel x:Name="FbxEnvironmentSettings">
+                                        <Label Target="{Binding ElementName=FbxSdkPath}" Content="{local:StudioText Key=Window.FbxSdk}" Style="{StaticResource FieldLabel}" />
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBox x:Name="FbxSdkPath" TextChanged="EnvironmentInput_Changed" AutomationProperties.Name="{local:StudioText Key=Window.FbxSdk}" />
+                                            <Button Grid.Column="1" Content="{local:StudioText Key=Window.Browse}" Margin="7,0,0,0" Tag="FbxSdk" Click="Browse_Click" AutomationProperties.Name="{local:StudioText Key=Window.BrowseFbxSdk}" />
+                                        </Grid>
+                                    </StackPanel>
+                                    <StackPanel x:Name="BnsEnvironmentSettings" Visibility="Collapsed">
+                                    <Label Target="{Binding ElementName=GamePaksPath}" Content="{local:StudioText Key=Window.GamePaks}" Style="{StaticResource FieldLabel}" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="GamePaksPath" TextChanged="EnvironmentInput_Changed" AutomationProperties.Name="{local:StudioText Key=Window.GamePaksPath}" />
+                                        <Button Grid.Column="1" Content="{local:StudioText Key=Window.Browse}" Margin="7,0,0,0" Tag="GamePaks" Click="Browse_Click" AutomationProperties.Name="{local:StudioText Key=Window.BrowseGamePaks}" />
+                                    </Grid>
+                                    <Label Target="{Binding ElementName=UnrealPath}" Content="UE4.25" Style="{StaticResource FieldLabel}" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="UnrealPath" TextChanged="EnvironmentInput_Changed" AutomationProperties.Name="{local:StudioText Key=Window.UnrealPath}" />
+                                        <Button Grid.Column="1" Content="{local:StudioText Key=Window.Browse}" Margin="7,0,0,0" Tag="Unreal" Click="Browse_Click" AutomationProperties.Name="{local:StudioText Key=Window.BrowseUnreal}" />
+                                    </Grid>
+                                    </StackPanel>
+                                    <Label Target="{Binding ElementName=OutputPath}" Content="{local:StudioText Key=Window.OutputDirectory}" Style="{StaticResource FieldLabel}" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox x:Name="OutputPath" TextChanged="EnvironmentInput_Changed" AutomationProperties.Name="{local:StudioText Key=Window.OutputDirectory}" />
+                                        <Button Grid.Column="1" Content="{local:StudioText Key=Window.Browse}" Margin="7,0,0,0" Tag="Output" Click="Browse_Click" AutomationProperties.Name="{local:StudioText Key=Window.BrowseOutput}" />
+                                    </Grid>
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <Button Content="{local:StudioText Key=Window.AutoFind}" Click="DetectEnvironment_Click" />
+                                        <Button Content="{local:StudioText Key=Window.SaveSettings}" Margin="7,0,0,0" Click="SaveEnvironment_Click" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Expander>
+                        </StackPanel>
+                    </ScrollViewer>
+                    <WrapPanel x:Name="TaskActions" Grid.Row="1" Margin="0,8,0,0" Visibility="Collapsed">
+                        <Button x:Name="BuildButton" Content="{local:StudioText Key=Window.ExportFbx}" Style="{StaticResource PrimaryButton}"
+                                Visibility="Collapsed" IsEnabled="False" Margin="0,0,6,0" Click="Build_Click" ToolTipService.ShowOnDisabled="True" />
+                        <Button x:Name="CancelButton" Content="{local:StudioText Key=Window.Cancel}" Visibility="Collapsed" IsEnabled="False" Click="Cancel_Click" />
+                        <Button x:Name="OpenOutputButton" Content="{local:StudioText Key=Window.OpenOutput}" Visibility="Collapsed" IsEnabled="False" Click="OpenOutput_Click"
+                                AutomationProperties.Name="{local:StudioText Key=Window.OpenOutputDirectory}" />
+                    </WrapPanel>
+                </Grid>
+            </Border>
+            <Grid Grid.Column="2">
+                <Border Background="#FAFCFB" BorderBrush="{StaticResource Rule}" BorderThickness="1" Padding="10,8">
+                    <TabControl x:Name="WorkTabs" Background="Transparent" BorderThickness="0" SelectedIndex="1">
+                        <TabItem x:Name="MappingTab" Header="{local:StudioText Key=Window.BoneMapping}">
+                            <Grid Margin="0,8,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <TextBlock x:Name="InspectionSummary" Text="{local:StudioText Key=Window.MappingHint}"
+                                           Foreground="{StaticResource Muted}" Margin="0,0,0,9" TextWrapping="Wrap" />
+                                <Border x:Name="MappingPreflight" Grid.Row="1" Background="#F2F6F3" BorderBrush="{StaticResource Rule}" BorderThickness="1"
+                                        Padding="7,5" Margin="0,0,0,8" Visibility="Collapsed">
+                                    <StackPanel>
+                                        <TextBlock x:Name="MappingPreflightSummary" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                        <StackPanel x:Name="MappingIssues" Margin="0,4,0,0">
+                                            <DockPanel Margin="0,0,0,4">
+                                                <Label Target="{Binding ElementName=MappingIssueFilter}" Content="{local:StudioText Key=Window.MappingIssueFilter}"
+                                                       VerticalAlignment="Center" Padding="0,0,7,0" />
+                                                <TextBox x:Name="MappingIssueFilter" AutomationProperties.Name="{local:StudioText Key=Window.MappingIssueFilter}" />
+                                            </DockPanel>
+                                            <ListBox x:Name="MappingIssueList" MaxHeight="86" BorderBrush="{StaticResource Rule}"
+                                                     AutomationProperties.Name="{local:StudioText Key=Window.MappingIssueList}"
+                                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                     VirtualizingPanel.VirtualizationMode="Recycling">
+                                                <ListBox.ItemContainerStyle>
+                                                    <Style TargetType="ListBoxItem">
+                                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                        <Setter Property="Padding" Value="0" />
+                                                    </Style>
+                                                </ListBox.ItemContainerStyle>
+                                                <ListBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Button Click="JumpToMapping_Click" ToolTip="{Binding Source}" AutomationProperties.Name="{Binding Source}"
+                                                                Cursor="Hand" MinHeight="24" Padding="6,1" BorderThickness="0" HorizontalContentAlignment="Left">
+                                                            <TextBlock Text="{Binding Source}" TextTrimming="CharacterEllipsis" />
+                                                        </Button>
+                                                    </DataTemplate>
+                                                </ListBox.ItemTemplate>
+                                            </ListBox>
+                                            <TextBlock x:Name="MappingIssueNoResults" Text="{local:StudioText Key=Window.MappingIssueNoResults}"
+                                                       Foreground="{StaticResource Muted}" Visibility="Collapsed" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                                <DataGrid x:Name="MappingGrid" Grid.Row="2"
+                                          ItemsSource="{Binding MappingRows}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                                          HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#E1E8E4"
+                                          RowBackground="White" AlternatingRowBackground="#F2F6F3" BorderBrush="{StaticResource Rule}"
+                                          EnableRowVirtualization="True" SelectionMode="Single" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="{local:StudioText Key=Window.SourceBone}" Binding="{Binding Source}" Width="*" IsReadOnly="True" />
+                                        <DataGridTemplateColumn x:Name="MappingTargetColumn" Header="{local:StudioText Key=Window.TargetBone}" Width="*">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Target}" Margin="7,4" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                            <DataGridTemplateColumn.CellEditingTemplate>
+                                                <DataTemplate>
+                                                    <ComboBox ItemsSource="{Binding DataContext.TargetBones, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                              SelectedItem="{Binding Target, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                              IsTextSearchEnabled="True" AutomationProperties.Name="{local:StudioText Key=Window.TargetBone}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellEditingTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTextColumn Header="{local:StudioText Key=Window.WeightScale}" Binding="{Binding WeightScale, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
+                                                            Width="86" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <StackPanel x:Name="MappingActions" Grid.Row="3" Orientation="Horizontal" Margin="0,7,0,0" IsEnabled="False">
+                                    <Button Content="{local:StudioText Key=Window.ImportMapping}" Click="ImportMapping_Click" />
+                                    <Button Content="{local:StudioText Key=Window.ExportMapping}" Click="ExportMapping_Click" Margin="6,0,0,0" />
+                                </StackPanel>
+                            </Grid>
+                        </TabItem>
+                        <TabItem x:Name="PreviewTab" Header="{local:StudioText Key=Window.Preview}">
+                            <Border x:Name="PreviewSurface" Margin="0,8,0,0" Background="#224645" ClipToBounds="True"
+                                    MouseLeftButtonDown="PreviewSurface_MouseDown" MouseLeftButtonUp="PreviewSurface_MouseUp"
+                                    MouseMove="PreviewSurface_MouseMove" MouseWheel="PreviewSurface_MouseWheel">
+                                <Grid>
+                                    <Viewport3D x:Name="ModelViewport" IsHitTestVisible="False" AutomationProperties.Name="{local:StudioText Key=Window.SourcePreview}" SizeChanged="ModelViewport_SizeChanged">
+                                        <Viewport3D.Camera>
+                                            <PerspectiveCamera x:Name="PreviewCamera" FieldOfView="36" />
+                                        </Viewport3D.Camera>
+                                        <ModelVisual3D>
+                                            <ModelVisual3D.Content>
+                                                <Model3DGroup>
+                                                    <AmbientLight Color="#798E91" />
+                                                    <DirectionalLight Color="#FFFFFF" Direction="-1,-3,-2" />
+                                                    <DirectionalLight Color="#A2C8BD" Direction="2,1,1" />
+                                                    <Model3DGroup x:Name="PreviewModel" />
+                                                </Model3DGroup>
+                                            </ModelVisual3D.Content>
+                                        </ModelVisual3D>
+                                    </Viewport3D>
+                                    <local:OutfitAxisWidget x:Name="PreviewAxes" Width="88" Height="88" Margin="0,8,8,0"
+                                                           HorizontalAlignment="Right" VerticalAlignment="Top" Visibility="Collapsed" />
+                                    <TextBlock x:Name="PreviewPlaceholder" Text="{local:StudioText Key=Window.PreviewHint}" Foreground="#D4E9E1"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" />
+                                </Grid>
+                            </Border>
+                        </TabItem>
+                        <TabItem x:Name="MaterialsTab" Header="{local:StudioText Key=Window.ModelAndMaterials}">
+                            <DockPanel Margin="0,8,0,0">
+                                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,5,0,0">
+                                    <Button x:Name="TextureButton" Content="{local:StudioText Key=Window.ReplaceTexture}" Click="Texture_Click" IsEnabled="False" />
+                                    <Button x:Name="ResetTextureButton" Content="{local:StudioText Key=Window.RestoreTexture}" Margin="6,0,0,0" Click="ResetTexture_Click" IsEnabled="False" />
+                                </StackPanel>
+                                <TextBlock x:Name="ModelSummary" DockPanel.Dock="Top" Text="{local:StudioText Key=Window.NoSourceModel}" Foreground="{StaticResource Muted}" />
+                                <DataGrid x:Name="MaterialGrid" ItemsSource="{Binding MaterialRows}"
+                                          Margin="0,6,0,0" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False"
+                                          HeadersVisibility="Column" GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#E1E8E4"
+                                          BorderBrush="{StaticResource Rule}" SelectionMode="Single" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                          SelectionChanged="MaterialSelection_Changed">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="{local:StudioText Key=Window.Slot}" Binding="{Binding Slot}" Width="48" IsReadOnly="True" />
+                                        <DataGridTextColumn Header="{local:StudioText Key=Window.Material}" Binding="{Binding Name}" Width="*" MinWidth="76" IsReadOnly="True" />
+                                        <DataGridTextColumn Header="{local:StudioText Key=Window.DiffuseTexture}" Binding="{Binding TextureDisplay}" Width="2*" MinWidth="142" IsReadOnly="True" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem x:Name="ProgressTab" Header="{local:StudioText Key=Window.BuildProgress}">
+                            <TextBox x:Name="ProgressLog" Margin="0,8,0,0" IsReadOnly="True" TextWrapping="Wrap"
+                                     VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Top"
+                                     AutomationProperties.Name="{local:StudioText Key=Window.BuildProgress}" />
+                        </TabItem>
+                    </TabControl>
+                </Border>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1" Margin="12,0,12,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="StatusText" Text="{local:StudioText Key=Window.StartHint}" FontSize="12" Foreground="{StaticResource Muted}"
+                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"
+                       ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" AutomationProperties.LiveSetting="Polite" />
+            <ProgressBar x:Name="Activity" Grid.Column="1" Width="84" Height="3" Margin="8,0,0,0"
+                         VerticalAlignment="Center" Visibility="Collapsed" IsIndeterminate="True" />
+        </Grid>
+    </Grid>
+</Window>

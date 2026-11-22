@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Version>1.0.0</Version>
+    <AssemblyName>UAssetManager.ModelStudio</AssemblyName>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <RootNamespace>UAssetManager.ModelStudio</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Localization/*.json" WithCulture="false" LogicalName="UAssetManager.ModelStudio.Localization.%(Filename)%(Extension)" />
+    <Compile Remove="PakBridge/**/*.cs;StudioPakAdapter.cs" />
+    <Reference Include="UAssetAPI.Pak" HintPath="$(HostReferenceDirectory)/UAssetAPI.Pak.dll" Private="false" />
+    <Reference Include="UAssetAPI" HintPath="$(HostReferenceDirectory)/UAssetAPI.dll" Private="false" />
+  </ItemGroup>
+
+  <Target Name="ValidateHostReferences" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="'$(HostReferenceDirectory)' == '' Or !Exists('$(HostReferenceDirectory)/UAssetAPI.Pak.dll') Or !Exists('$(HostReferenceDirectory)/UAssetAPI.dll')" Text="Set HostReferenceDirectory to the UAssetManager build output containing UAssetAPI.Pak.dll and UAssetAPI.dll." />
+  </Target>
+</Project>

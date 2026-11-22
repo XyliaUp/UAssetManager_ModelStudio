@@ -1,0 +1,45 @@
+<UserControl x:Class="UAssetManager.ModelStudio.OutfitProductionOptions"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:UAssetManager.ModelStudio">
+    <StackPanel Margin="0,7,0,0">
+        <TextBlock Text="{local:StudioText Key=Production.HideWhenWorn, Fallback='穿着这件服装时隐藏'}" FontWeight="SemiBold" Margin="0,2,0,5" />
+        <WrapPanel>
+            <CheckBox x:Name="HideFaceOption" Content="{local:StudioText Key=Production.Face, Fallback='原脸'}" Margin="0,0,10,4" />
+            <CheckBox x:Name="HideHairOption" Content="{local:StudioText Key=Production.Hair, Fallback='原发'}" Margin="0,0,10,4" />
+            <CheckBox x:Name="HideHeadgearOption" Content="{local:StudioText Key=Production.Headgear, Fallback='原头饰'}" Margin="0,0,0,4" />
+        </WrapPanel>
+        <Expander Header="{local:StudioText Key=Production.CustomHidePaths, Fallback='自定义隐藏路径'}" Margin="0,0,0,4">
+            <StackPanel Margin="0,4,0,0">
+                <TextBlock Text="{local:StudioText Key=Production.HidePathHint, Fallback='每行一个 /Character/ 下的部件目录，以 / 结尾。'}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,4" />
+                <TextBox x:Name="OtherPaths" AutomationProperties.Name="{local:StudioText Key=Production.CustomHidePaths, Fallback='自定义隐藏路径'}" AcceptsReturn="True" MinHeight="45" MaxHeight="100" VerticalScrollBarVisibility="Auto" />
+            </StackPanel>
+        </Expander>
+        <Label Target="{Binding ElementName=CompressionOption}" Content="{local:StudioText Key=Production.Compression, Fallback='PAK 压缩'}" FontWeight="SemiBold" Padding="0" Margin="0,4,0,4" />
+        <ComboBox x:Name="CompressionOption" AutomationProperties.Name="{local:StudioText Key=Production.Compression, Fallback='PAK 压缩'}">
+            <ComboBoxItem Content="Oodle Kraken" Tag="oodle" />
+            <ComboBoxItem Content="{local:StudioText Key=Production.Uncompressed, Fallback='不压缩'}" Tag="none" />
+        </ComboBox>
+        <Expander Header="{local:StudioText Key=Production.HairPhysics, Fallback='头发物理'}" Margin="0,8,0,0">
+            <StackPanel Margin="0,5,0,0">
+                <CheckBox x:Name="HairEnabled" Content="{local:StudioText Key=Production.EnableHairPhysics, Fallback='启用头发物理'}" Margin="0,0,0,5" />
+                <StackPanel IsEnabled="{Binding IsChecked, ElementName=HairEnabled}">
+                    <TextBlock Text="{local:StudioText Key=Production.HairChainHint, Fallback='按发根到发梢填写 2–32 根已绑定权重的目标骨骼。多个名称可换行，或用逗号分隔。'}" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,4" />
+                    <TextBox x:Name="HairBones" AutomationProperties.Name="{local:StudioText Key=Production.HairChainBones, Fallback='发链骨骼'}" AcceptsReturn="True" MinHeight="45" MaxHeight="92" VerticalScrollBarVisibility="Auto" />
+                    <Label Target="{Binding ElementName=HairAnchor}" Content="{local:StudioText Key=Production.HeadAnchor, Fallback='头部锚点'}" Padding="0" Margin="0,5,0,2" />
+                    <TextBox x:Name="HairAnchor" AutomationProperties.Name="{local:StudioText Key=Production.HeadAnchor, Fallback='头部锚点'}" />
+                    <Label Target="{Binding ElementName=HairTorso}" Content="{local:StudioText Key=Production.TorsoBoneOptional, Fallback='胸背碰撞骨（可留空）'}" Padding="0" Margin="0,5,0,2" />
+                    <TextBox x:Name="HairTorso" AutomationProperties.Name="{local:StudioText Key=Production.TorsoBone, Fallback='胸背碰撞骨'}" />
+                    <Expander Header="{local:StudioText Key=Production.GravityCollisionConstraints, Fallback='重力、碰撞与约束'}" Margin="0,5,0,0">
+                        <Grid x:Name="HairNumbers" Margin="0,4,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="68" />
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                    </Expander>
+                </StackPanel>
+            </StackPanel>
+        </Expander>
+    </StackPanel>
+</UserControl>
